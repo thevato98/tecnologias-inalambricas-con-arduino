@@ -1,0 +1,121 @@
+visual estudio using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.IO.Ports;
+using System.Linq;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+
+
+namespace Datos_arduino
+{
+    public partial class FormConnection : Form
+    {
+
+        System.IO.Ports.SerialPort Port;
+        bool isClosed = false;
+        public FormConnection()
+        {
+            InitializeComponent();
+
+            Port = new System.IO.Ports.SerialPort();     
+            Port.PortName = "COM4"; /*Checar el com */
+            Port.BaudRate = 9600;
+            Port.ReadTimeout = 500;
+            try
+            {
+                Port.Open();
+            }
+            catch { }
+
+        }
+
+        private void Form1_Load(object sender, EventArgs e)
+        {
+
+            Thread Hilo = new Thread(EsucharSerial);
+            Hilo.Start();
+
+
+
+          /*  BtnCon.Enabled = false;
+            BtnCon.BringToFront();
+
+            BtnDiscon.Enabled = false;
+            BtnDiscon.SendToBack(); */
+
+
+            /* CmbBaud.selectedItem = "9600";*/
+
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void BtnCon_Click(object sender, EventArgs e)
+        {
+
+            BtnCon.Enabled = false;
+            BtnCon.SendToBack();
+
+            BtnDiscon.Enabled = true;
+            BtnDiscon.BringToFront();
+
+        }
+
+        private void BtnDiscon_Click(object sender, EventArgs e)
+        {
+
+            Close();
+
+            BtnDiscon.Enabled = false;
+            BtnDiscon.SendToBack();
+
+
+            BtnCon.Enabled = true;
+            BtnCon.BringToFront();
+        }
+
+    
+
+        private void EsucharSerial()
+
+        {
+            while (!isClosed)
+            {
+                try
+                {
+                    string cadena = Port.ReadLine();
+                    txtAlgo.Invoke(new MethodInvoker(
+                        delegate
+                        {
+                            txtAlgo.Text = cadena;
+
+                        }
+
+                        ));
+                    
+                }
+                catch { }
+            }
+
+        }
+
+        private void txtAlgo_TextChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void FormConnection_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            isClosed = true;
+        }
+    }
+
+}
